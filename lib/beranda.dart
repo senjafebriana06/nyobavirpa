@@ -8,7 +8,7 @@ void main() {
 }
 
 class BerandaPage extends StatelessWidget {
-  String username, password;
+  String username = "", password = "";
 
   @override
   Widget build(BuildContext context) {

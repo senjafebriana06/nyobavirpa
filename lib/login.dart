@@ -1,15 +1,53 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:nyobavirpa/menu.dart';
+import 'package:nyobavirpa/signup.dart';
+import 'package:nyobavirpa/widgets/text_input.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginPage extends StatelessWidget {
-  TextEditingController user = TextEditingController();
-  TextEditingController pass = TextEditingController();
-  String username, password;
+class LoginPage extends StatefulWidget {
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  String? username;
+  String? password;
+
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  SharedPreferences? prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    usernameController.addListener(() {
+      setState(() {
+        username = usernameController.text;
+      });
+    });
+    passwordController.addListener(() {
+      setState(() {
+        password = passwordController.text;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+
+    EasyLoading.instance
+      ..userInteractions = false
+      ..indicatorType = EasyLoadingIndicatorType.ring
+      ..dismissOnTap = false;
+
+    return FlutterEasyLoading(
+        child:Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -36,7 +74,6 @@ class LoginPage extends StatelessWidget {
                 Column(
                   children: <Widget>[
                     Text(
-                      onSaved: (e)=>email = e,
                       "Login",
                       style: TextStyle(
                         fontSize: 30,
@@ -57,14 +94,16 @@ class LoginPage extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
                       children: <Widget>[
-                        inputUsername(label: "Username"),
+                        TextInput(
+                            label: 'Username', controller: usernameController)
                       ],
                     )),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
                     children: <Widget>[
-                      inputPassword(label: "Password", obscureText: true),
+                      TextInput(
+                          label: 'Password', controller: passwordController)
                     ],
                   ),
                 ),
@@ -84,10 +123,25 @@ class LoginPage extends StatelessWidget {
                       minWidth: double.infinity,
                       height: 50,
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MenuPage()));
+                        firestore
+                            .collection('users')
+                            .where("username", isEqualTo: username)
+                            .where("password", isEqualTo: password)
+                            .get()
+                            .then((snapshot) async {
+                          if (snapshot.docs.isEmpty) {
+                            EasyLoading.showInfo(
+                                'Username atau password yang anda masukan salah');
+                          } else {
+                            prefs = await SharedPreferences.getInstance();
+                            await prefs?.setString('id', snapshot.docs[0].id);
+                            await prefs?.setString('username', snapshot.docs[0].data()['username']);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MenuPage()));
+                          }
+                        });
                       },
                       color: Color(0xff0095FF),
                       elevation: 0,
@@ -109,11 +163,15 @@ class LoginPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text("Don't have an Account?"),
-                    Text(
-                      "Sign Up",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => SignUpPage())),
+                      child: Text(
+                        "Sign Up",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
                       ),
                     )
                   ],
@@ -132,7 +190,7 @@ class LoginPage extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 
 //membuat text field
@@ -150,7 +208,7 @@ class LoginPage extends StatelessWidget {
         ),
         TextField(
           obscureText: obscureText,
-          controller: user,
+          controller: usernameController,
           decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
               enabledBorder: OutlineInputBorder(
@@ -182,7 +240,7 @@ class LoginPage extends StatelessWidget {
         ),
         TextField(
           obscureText: true,
-          controller: pass,
+          controller: passwordController,
           decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
               enabledBorder: OutlineInputBorder(

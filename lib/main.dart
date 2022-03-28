@@ -1,17 +1,23 @@
 import 'package:camera/camera.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:nyobavirpa/menu.dart';
 import 'package:nyobavirpa/signup.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login.dart';
 
 late List<CameraDescription> cameras;
+SharedPreferences? prefs;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   cameras = await availableCameras();
+
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     home: HomePage(),
@@ -19,9 +25,33 @@ void main() async {
 }
 
 class HomePage extends StatelessWidget {
+
+  void checkAuth(BuildContext context) async {
+
+  prefs = await SharedPreferences.getInstance();
+
+  String? id = prefs?.getString('id');
+
+  if(id!= null) {
+     Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MenuPage()));
+  }
+
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    checkAuth(context);
+
+    EasyLoading.instance
+      ..userInteractions = false
+      ..indicatorType = EasyLoadingIndicatorType.ring
+      ..dismissOnTap = false;
+
+    return FlutterEasyLoading(
+        child: Scaffold(
       appBar: AppBar(
         title: Text("VIRPA"),
         centerTitle: true,
@@ -131,6 +161,6 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }

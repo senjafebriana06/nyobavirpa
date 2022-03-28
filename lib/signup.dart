@@ -1,12 +1,58 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:nyobavirpa/beranda.dart';
 import 'package:nyobavirpa/main.dart';
 import 'package:nyobavirpa/menu.dart';
+import 'package:nyobavirpa/widgets/text_input.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
+  @override
+  State<SignUpPage> createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  String? email;
+  String? username;
+  String? password;
+
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    emailController.addListener(() {
+      setState(() {
+        email = emailController.text;
+      });
+    });
+    usernameController.addListener(() {
+      setState(() {
+        username = usernameController.text;
+      });
+    });
+    passwordController.addListener(() {
+      setState(() {
+        password = passwordController.text;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+
+    EasyLoading.instance
+      ..userInteractions = false
+      ..indicatorType = EasyLoadingIndicatorType.ring
+      ..dismissOnTap = false;
+
+    return FlutterEasyLoading(
+        child:Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -52,9 +98,12 @@ class SignUpPage extends StatelessWidget {
               ),
               Column(
                 children: <Widget>[
-                  inputFile(label: "Email"),
-                  inputFile(label: "Username"),
-                  inputFile(label: "Password", obscureText: true),
+                  TextInput(label: "Email", controller: emailController),
+                  TextInput(label: "Username", controller: usernameController),
+                  TextInput(
+                      label: "Password",
+                      obscureText: true,
+                      controller: passwordController),
                 ],
               ),
               Container(
@@ -71,8 +120,24 @@ class SignUpPage extends StatelessWidget {
                   minWidth: double.infinity,
                   height: 60,
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => MenuPage()));
+                    firestore
+                        .collection("users")
+                        .where("email", isEqualTo: email)
+                        .get()
+                        .then((snapshot) {
+                      if (snapshot.docs.isEmpty) {
+                        firestore.collection("users").add({
+                          'email': email,
+                          'username': username,
+                          'password': password,
+                        }).then((result) async {
+                          EasyLoading.showSuccess('Berhasil melakukan pendaftaran');
+                          Navigator.of(context).pop();
+                        });
+                      } else {
+                        EasyLoading.showInfo('Email tersebut telah terdaftar');
+                      }
+                    });
                   },
                   color: Color(0xff0095FF),
                   elevation: 0,
@@ -103,38 +168,6 @@ class SignUpPage extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
-}
-
-//membuat text field
-Widget inputFile({label, obscureText = false}) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      Text(
-        label,
-        style: TextStyle(
-            fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black87),
-      ),
-      SizedBox(
-        height: 5,
-      ),
-      TextField(
-        obscureText: obscureText,
-        decoration: InputDecoration(
-            contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.grey,
-              ),
-            ),
-            border:
-                OutlineInputBorder(borderSide: BorderSide(color: Colors.grey))),
-      ),
-      SizedBox(
-        height: 10,
-      )
-    ],
-  );
 }
