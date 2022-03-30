@@ -25,20 +25,15 @@ void main() async {
 }
 
 class HomePage extends StatelessWidget {
-
   void checkAuth(BuildContext context) async {
+    prefs = await SharedPreferences.getInstance();
 
-  prefs = await SharedPreferences.getInstance();
+    String? id = prefs?.getString('id');
 
-  String? id = prefs?.getString('id');
-
-  if(id!= null) {
-     Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => MenuPage()));
-  }
-
+    if (id != null) {
+      /*Navigator.push(
+          context, MaterialPageRoute(builder: (context) => MenuPage()));*/
+    }
   }
 
   @override
