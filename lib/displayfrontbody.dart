@@ -7,16 +7,16 @@ import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class BodyImage extends StatefulWidget {
+class FrontBodyImage extends StatefulWidget {
   final String imagePath;
 
-  const BodyImage({Key? key, required this.imagePath}) : super(key: key);
+  const FrontBodyImage({Key? key, required this.imagePath}) : super(key: key);
 
   @override
-  State<BodyImage> createState() => _BodyImageState();
+  State<FrontBodyImage> createState() => _FrontBodyImageState();
 }
 
-class _BodyImageState extends State<BodyImage> {
+class _FrontBodyImageState extends State<FrontBodyImage> {
 
   SharedPreferences? prefs;
 
@@ -62,9 +62,9 @@ class _BodyImageState extends State<BodyImage> {
         ElevatedButton(onPressed: ()async {
           prefs = await SharedPreferences.getInstance();
           String? id = await prefs?.getString("id");
-          String? result = await uploadImage(File(widget.imagePath), 'body', id ?? '');
+          String? result = await uploadImage(File(widget.imagePath), 'frontBody', id ?? '');
 
-          await firestore.collection('users').doc(id).update({'body': result});
+          await firestore.collection('users').doc(id).update({'frontBody': result});
 
           Navigator.of(context).pop(3);
         }, child: Text('Submit'))

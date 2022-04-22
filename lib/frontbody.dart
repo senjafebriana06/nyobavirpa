@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:nyobavirpa/displaybody.dart';
-import 'displaybody.dart';
+import 'package:nyobavirpa/displayfrontbody.dart';
+import 'displayfrontbody.dart';
 import 'main.dart';
 
 
-class BodyCamera extends StatefulWidget {
+class FrontBodyCamera extends StatefulWidget {
   final bool isCameraOverlayCircle;
 
-  const BodyCamera({Key? key, required this.isCameraOverlayCircle})
+  const FrontBodyCamera({Key? key, required this.isCameraOverlayCircle})
       : super(key: key);
 
   @override
-  _BodyCameraState createState() => _BodyCameraState();
+  _FrontBodyCameraState createState() => _FrontBodyCameraState();
 }
 
-class _BodyCameraState extends State<BodyCamera> {
+class _FrontBodyCameraState extends State<FrontBodyCamera> {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
             // final image = await controller.takePicture();
             await controller.takePicture().then((value) {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => BodyImage(
+                  builder: (context) => FrontBodyImage(
                         imagePath: value.path,
                       )));
             });

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:nyobavirpa/cropping.dart';
 import 'package:nyobavirpa/menu.dart';
 import 'package:nyobavirpa/signup.dart';
 import 'package:nyobavirpa/widgets/text_input.dart';
@@ -73,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 Column(
                   children: <Widget>[
-                    Text(
+                    const Text(
                       "Login",
                       style: TextStyle(
                         fontSize: 30,
@@ -81,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                         fontFamily: 'Poppins',
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Text(
@@ -113,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                     padding: EdgeInsets.only(top: 3, left: 3),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
-                        border: Border(
+                        border: const Border(
                           bottom: BorderSide(color: Colors.black),
                           top: BorderSide(color: Colors.black),
                           left: BorderSide(color: Colors.black),
@@ -148,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Login",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
@@ -165,8 +166,8 @@ class _LoginPageState extends State<LoginPage> {
                     Text("Don't have an Account?"),
                     GestureDetector(
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => SignUpPage())),
-                      child: Text(
+                          builder: (context) => CroppingPage())),
+                      child: const Text(
                         "Sign Up",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,

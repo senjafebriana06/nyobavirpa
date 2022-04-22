@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nyobavirpa/besidebody.dart';
+import 'package:nyobavirpa/frontbody.dart';
 
-import 'package:nyobavirpa/body.dart';
 import 'package:nyobavirpa/head.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,7 +19,8 @@ class _CameraPageState extends State<CameraPage> {
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  String? bodyImage;
+  String? frontBodyImage;
+  String? besideBodyImage;
   String? headImage;
 
   void getImage() async {
@@ -28,10 +30,13 @@ class _CameraPageState extends State<CameraPage> {
 
     firestore.collection("users").doc(id).get().then((result) {
       setState(() {
-        if (result.data()!['body'] != null) {
-          bodyImage = result.data()!['body'];
+        if (result.data()!['frontbody'] != null) {
+          frontBodyImage = result.data()!['frontbody'];
         }
-        if (result.data()!['body'] != null) {
+        if (result.data()!['besidebody'] != null) {
+          besideBodyImage = result.data()!['besidebody'];
+        }
+        if (result.data()!['frontbody'] != null) {
           headImage = result.data()!['head'];
         }
       });
@@ -55,17 +60,17 @@ class _CameraPageState extends State<CameraPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                if (bodyImage != null)
+                if (frontBodyImage != null)
                   Padding(
                       padding: EdgeInsets.all(30),
-                      child: Image.network(bodyImage!)),
+                      child: Image.network(frontBodyImage!)),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Container(
                     padding: EdgeInsets.only(top: 3, left: 3),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
-                        border: Border(
+                        border: const Border(
                           bottom: BorderSide(color: Colors.black),
                           top: BorderSide(color: Colors.black),
                           left: BorderSide(color: Colors.black),
@@ -78,7 +83,7 @@ class _CameraPageState extends State<CameraPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => BodyCamera(
+                                builder: (context) => const FrontBodyCamera(
                                       isCameraOverlayCircle: true,
                                     )));
                       },
@@ -87,8 +92,51 @@ class _CameraPageState extends State<CameraPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
                       ),
-                      child: Text(
-                        "Body Camera",
+                      child: const Text(
+                        "In Front of Body Camera",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                if (besideBodyImage != null)
+                  Padding(
+                      padding: EdgeInsets.all(30),
+                      child: Image.network(besideBodyImage!)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Container(
+                    padding: EdgeInsets.only(top: 3, left: 3),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        border: const Border(
+                          bottom: BorderSide(color: Colors.black),
+                          top: BorderSide(color: Colors.black),
+                          left: BorderSide(color: Colors.black),
+                          right: BorderSide(color: Colors.black),
+                        )),
+                    child: MaterialButton(
+                      minWidth: double.infinity,
+                      height: 50,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const BesideBodyCamera(
+                                      isCameraOverlayCircle: true,
+                                    )));
+                      },
+                      color: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Text(
+                        "Besides of Body Camera",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 18,
@@ -103,12 +151,12 @@ class _CameraPageState extends State<CameraPage> {
                       padding: EdgeInsets.all(30),
                       child: Image.network(headImage!)),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Container(
                     padding: EdgeInsets.only(top: 3, left: 3),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
-                        border: Border(
+                        border: const Border(
                           bottom: BorderSide(color: Colors.black),
                           top: BorderSide(color: Colors.black),
                           left: BorderSide(color: Colors.black),
