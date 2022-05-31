@@ -53,144 +53,147 @@ class _CameraPageState extends State<CameraPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightBlueAccent,
-      body: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                if (frontBodyImage != null)
+      body: SafeArea(
+        child: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  if (frontBodyImage != null)
+                    Padding(
+                        padding: EdgeInsets.all(30),
+                        child: Image.network(frontBodyImage!)),
                   Padding(
-                      padding: EdgeInsets.all(30),
-                      child: Image.network(frontBodyImage!)),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Container(
-                    padding: EdgeInsets.only(top: 3, left: 3),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        border: const Border(
-                          bottom: BorderSide(color: Colors.black),
-                          top: BorderSide(color: Colors.black),
-                          left: BorderSide(color: Colors.black),
-                          right: BorderSide(color: Colors.black),
-                        )),
-                    child: MaterialButton(
-                      minWidth: double.infinity,
-                      height: 50,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const FrontBodyCamera(
-                                      isCameraOverlayCircle: true,
-                                    )));
-                      },
-                      color: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Text(
-                        "In Front of Body Camera",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.black,
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Container(
+                      padding: EdgeInsets.only(top: 3, left: 3),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          border: const Border(
+                            bottom: BorderSide(color: Colors.black),
+                            top: BorderSide(color: Colors.black),
+                            left: BorderSide(color: Colors.black),
+                            right: BorderSide(color: Colors.black),
+                          )),
+                      child: MaterialButton(
+                        minWidth: double.infinity,
+                        height: 50,
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const FrontBodyCamera(
+                                        isCameraOverlayCircle: true,
+                                      )));
+                        },
+                        color: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: const Text(
+                          "In Front of Body Camera",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                if (besideBodyImage != null)
+                  if (besideBodyImage != null)
+                    Padding(
+                        padding: EdgeInsets.all(30),
+                        child: Image.network(besideBodyImage!)),
                   Padding(
-                      padding: EdgeInsets.all(30),
-                      child: Image.network(besideBodyImage!)),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Container(
-                    padding: EdgeInsets.only(top: 3, left: 3),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        border: const Border(
-                          bottom: BorderSide(color: Colors.black),
-                          top: BorderSide(color: Colors.black),
-                          left: BorderSide(color: Colors.black),
-                          right: BorderSide(color: Colors.black),
-                        )),
-                    child: MaterialButton(
-                      minWidth: double.infinity,
-                      height: 50,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const BesideBodyCamera(
-                                      isCameraOverlayCircle: true,
-                                    )));
-                      },
-                      color: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Text(
-                        "Besides of Body Camera",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.black,
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Container(
+                      padding: EdgeInsets.only(top: 3, left: 3),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          border: const Border(
+                            bottom: BorderSide(color: Colors.black),
+                            top: BorderSide(color: Colors.black),
+                            left: BorderSide(color: Colors.black),
+                            right: BorderSide(color: Colors.black),
+                          )),
+                      child: MaterialButton(
+                        minWidth: double.infinity,
+                        height: 50,
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const BesideBodyCamera(
+                                        isCameraOverlayCircle: true,
+                                      )));
+                        },
+                        color: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: const Text(
+                          "Besides of Body Camera",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                if (headImage != null)
-                  Padding(
+                  if (headImage != null)
+                    Padding(
                       padding: EdgeInsets.all(30),
-                      child: Image.network(headImage!)),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Container(
-                    padding: EdgeInsets.only(top: 3, left: 3),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        border: const Border(
-                          bottom: BorderSide(color: Colors.black),
-                          top: BorderSide(color: Colors.black),
-                          left: BorderSide(color: Colors.black),
-                          right: BorderSide(color: Colors.black),
-                        )),
-                    child: MaterialButton(
-                      minWidth: double.infinity,
-                      height: 50,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    HeadCamera(isCameraOverlayCircle: true)));
-                      },
-                      color: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: Text(
-                        "Head Camera",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.black,
+                      child: Image.network(headImage!),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Container(
+                      padding: EdgeInsets.only(top: 3, left: 3),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          border: const Border(
+                            bottom: BorderSide(color: Colors.black),
+                            top: BorderSide(color: Colors.black),
+                            left: BorderSide(color: Colors.black),
+                            right: BorderSide(color: Colors.black),
+                          )),
+                      child: MaterialButton(
+                        minWidth: double.infinity,
+                        height: 50,
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      HeadCamera(isCameraOverlayCircle: true)));
+                        },
+                        color: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Text(
+                          "Head Camera",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          )),
+                ],
+              ),
+            )),
+      ),
     );
   }
 }

@@ -1,9 +1,13 @@
+import 'dart:convert' as convert;
 import 'dart:io';
-
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:nyobavirpa/main.dart';
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -17,11 +21,13 @@ class FrontBodyImage extends StatefulWidget {
 }
 
 class _FrontBodyImageState extends State<FrontBodyImage> {
-
   SharedPreferences? prefs;
 
+  String? processedImageUrl;
+  bool isImageProcessed = false;
+
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  
+
   Future<String?> uploadImage(File image, String type, String id) async {
     firebase_storage.UploadTask task;
 
@@ -58,16 +64,53 @@ class _FrontBodyImageState extends State<FrontBodyImage> {
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
       body: Column(children: [
-        Image.file(File(widget.imagePath)),
-        ElevatedButton(onPressed: ()async {
-          prefs = await SharedPreferences.getInstance();
-          String? id = await prefs?.getString("id");
-          String? result = await uploadImage(File(widget.imagePath), 'frontBody', id ?? '');
+        if (isImageProcessed)
+          Image.network(processedImageUrl!, loadingBuilder:
+              (BuildContext context, Widget child,
+                  ImageChunkEvent? loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                    : null,
+              ),
+            );
+          }),
+        if (!isImageProcessed) Image.file(File(widget.imagePath)),
+        ElevatedButton(
+            onPressed: () async {
+              if (!isImageProcessed) {
+                context.read<BsaState>().setB = true;
 
-          await firestore.collection('users').doc(id).update({'frontBody': result});
+                prefs = await SharedPreferences.getInstance();
+                String? id = await prefs?.getString("id");
+                String? result = await uploadImage(
+                    File(widget.imagePath), 'frontBody', id ?? '');
+                await firestore
+                    .collection('users')
+                    .doc(id)
+                    .update({'frontBody': result});
 
-          Navigator.of(context).pop(3);
-        }, child: Text('Submit'))
+                var url =
+                    Uri.parse('https://virpaflaskapp.azurewebsites.net/front');
+                var response = await http.post(url,
+                    body: {'id': id, 'image_name': basename(widget.imagePath)});
+                var jsonResponse =
+                    convert.jsonDecode(response.body) as Map<String, dynamic>;
+
+                context.read<BsaState>().setBVal = jsonResponse['b'];
+
+                setState(() {
+                  isImageProcessed = true;
+                  processedImageUrl = jsonResponse['result'];
+                });
+              } else {
+                Navigator.of(context).pop(3);
+              }
+            },
+            child: Text('Lanjut')),
       ]),
     );
   }

@@ -1,10 +1,14 @@
+import 'dart:developer';
+
 import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:nyobavirpa/menu.dart';
 import 'package:nyobavirpa/signup.dart';
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login.dart';
@@ -18,10 +22,62 @@ void main() async {
 
   cameras = await availableCameras();
 
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: HomePage(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => BsaState()),
+    ],
+    child: MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: HomePage(),
+    ),
   ));
+}
+
+class BsaState with ChangeNotifier, DiagnosticableTreeMixin {
+  bool _a_set = false;
+  bool _b_set = false;
+  double _a = 0;
+  double _b = 0;
+  double _t = 0;
+
+  bool get a_set => _a_set;
+  bool get b_set => _b_set;
+  double get a => _a;
+  double get b => _b;
+  double get t => _t;
+
+  set setA(bool __a) {
+    _a_set = __a;
+    notifyListeners();
+  }
+
+  set setB(bool __b) {
+    _b_set = __b;
+    notifyListeners();
+  }
+
+  set setAVal(double val) {
+    _a = val;
+    notifyListeners();
+  }
+
+  set setBVal(double val) {
+    _b = val;
+    notifyListeners();
+  }
+
+  set setTVal(double val) {
+    _t = val;
+    notifyListeners();
+  }
+
+  void reset() {
+    _a_set = false;
+    _b_set = false;
+    _a = 0;
+    _b = 0;
+    _t = 0;
+  }
 }
 
 class HomePage extends StatelessWidget {

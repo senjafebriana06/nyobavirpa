@@ -4,7 +4,6 @@ import 'package:nyobavirpa/displaybesidebody.dart';
 
 import 'main.dart';
 
-
 class BesideBodyCamera extends StatefulWidget {
   final bool isCameraOverlayCircle;
 
@@ -74,7 +73,7 @@ class _HomePageState extends State<HomePage> {
             // final image = await controller.takePicture();
             await controller.takePicture().then((value) {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => BesideBodyImage(
+                  builder: (context) => SideBodyImage(
                         imagePath: value.path,
                       )));
             });
