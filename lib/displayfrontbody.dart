@@ -109,8 +109,10 @@ class _FrontBodyImageState extends State<FrontBodyImage> {
                 child: Text('Lanjut'))
           ]),
         if (processingImage && !imageProcessed)
-          const Center(
-            child: CircularProgressIndicator(),
+          const Expanded(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           ),
         if (!processingImage && imageProcessed)
           Column(

@@ -32,16 +32,14 @@ class _ProfileFormState extends State<ProfileForm> {
       prefs = await SharedPreferences.getInstance();
       String? id = prefs?.getString("id");
       print("adasd");
-      firestore
-          .collection("users")
-          .doc(id)
-          .set({
-            'name': nameInputController.text,
-            'age': int.parse(ageInputController.text),
-            'gender': _gender == Gender.L ? "L" : "P"
-          }, SetOptions(merge: true))
-          .then((value) => Navigator.pop(context))
-          .catchError((error) => print("Failed $error"));
+      firestore.collection("users").doc(id).set({
+        'name': nameInputController.text,
+        'age': int.parse(ageInputController.text),
+        'gender': _gender == Gender.L ? "L" : "P"
+      }, SetOptions(merge: true)).then((value) {
+        int count = 0;
+        Navigator.of(context).popUntil((_) => count++ >= 2);
+      }).catchError((error) => print("Failed $error"));
     }
 
     return Scaffold(

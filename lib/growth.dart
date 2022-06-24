@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:intl/intl.dart';
 import 'package:nyobavirpa/models/gender_enum.dart';
 import 'package:nyobavirpa/models/growth_list_model.dart';
 import 'package:nyobavirpa/models/growth_model.dart';
 import 'package:nyobavirpa/models/weight_status_enum.dart';
+import 'package:nyobavirpa/service/weight_status_to_string_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Growth extends StatefulWidget {
@@ -18,7 +20,7 @@ class Growth extends StatefulWidget {
 class _GrowthState extends State<Growth> {
   SharedPreferences? prefs;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
-
+  final f = DateFormat('yyyy-MM-dd hh:mm');
   List growthList = [];
 
   @override
@@ -72,25 +74,25 @@ class _GrowthState extends State<Growth> {
                           ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
                           Row(children: [
                             Text("Jenis Kelamin: "),
-                            Text(growth.gender.toString() == "L"
+                            Text(growth.gender == Gender.L
                                 ? "Laki-laki"
                                 : "Perempuan")
                           ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
                           Row(children: [
                             Text("Tanggal: "),
-                            Text(growth.date.toDate().toString()),
+                            Text(f.format(growth.date.toDate())),
                           ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
                           Row(children: [
                             Text("Status: "),
-                            Text(growth.status.toString())
+                            Text(weightStatusToString(growth.status))
                           ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
                           Row(children: [
                             Text("Berat Badan: "),
-                            Text(growth.weight.toString() + " Kg")
+                            Text(growth.weight.toStringAsFixed(2) + " Kg")
                           ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
                           Row(children: [
                             Text("Tinggi Badan: "),
-                            Text(growth.height.toString() + " Cm")
+                            Text(growth.height.toStringAsFixed(2) + " Cm")
                           ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
                         ],
                       ),

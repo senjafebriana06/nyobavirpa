@@ -17,12 +17,6 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override
-  void initState() {
-    super.initState();
-    print("init");
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -71,13 +65,27 @@ class _ProfilePageState extends State<ProfilePage> {
             }
             return Container(
               width: double.infinity,
+              padding: const EdgeInsets.all(18.0),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text((profileSnap.data?.nama)!),
+                  Text(
+                    (profileSnap.data?.nama)!,
+                    style: TextStyle(fontSize: 28.0),
+                  ),
                   Text((profileSnap.data?.jenisKelamin)! == "L"
                       ? "Laki-laki"
                       : "Perempuan"),
-                  Text((profileSnap.data?.umur)!.toString()),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text((profileSnap.data?.umur)!.toString()),
+                      Text(" bulan"),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 18,
+                  ),
                   InkWell(
                     child: Container(
                       child: Center(
@@ -85,18 +93,15 @@ class _ProfilePageState extends State<ProfilePage> {
                         "Ubah",
                         style: TextStyle(color: Colors.white),
                       )),
-                      color: Colors.orange,
+                      color: Colors.blue,
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       width: 100.0,
                     ),
                     onTap: () async {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => const ProfileForm()));
-                      prefs = await SharedPreferences.getInstance();
-                      String? id = prefs?.getString("id");
-                      print("tapp");
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ProfileForm()));
                     },
                   )
                 ],

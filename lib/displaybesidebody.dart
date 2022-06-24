@@ -14,6 +14,7 @@ import "dart:math" show pi;
 
 import 'models/gender_enum.dart';
 import 'models/weight_status_enum.dart';
+import 'service/weight_status_to_string_service.dart';
 
 class SideBodyImage extends StatefulWidget {
   final String imagePath;
@@ -30,23 +31,13 @@ class _SideBodyImageState extends State<SideBodyImage> {
   String? processedImageUrl;
   bool processingImage = false;
   bool imageProcessed = false;
+  String statusString = "";
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   double getWeight(double a, double b, double t) {
     double bsa = (pi / 2) * ((a * b) + ((a + b) * t)) * 1.32 * 0.0001;
     return bsa * bsa * 3600 / t;
-  }
-
-  String weightStatusToString(Status status) {
-    if (status == Status.severlyUnderweight) {
-      return "SEVERLYUNDERWEIGHT";
-    } else if (status == Status.underweight) {
-      return "UNDERWEIGHT";
-    } else if (status == Status.normal) {
-      return "NORMAL";
-    }
-    return "OVERWEIGHT";
   }
 
   Future<String?> uploadImage(File image, String type, String id) async {
@@ -80,8 +71,6 @@ class _SideBodyImageState extends State<SideBodyImage> {
 
   @override
   Widget build(BuildContext context) {
-    String statusString = "";
-
     return Scaffold(
       appBar: AppBar(title: const Text('Display the Picture')),
       // The image is stored as a file on the device. Use the `Image.file`
@@ -110,6 +99,23 @@ class _SideBodyImageState extends State<SideBodyImage> {
                   var url =
                       Uri.parse('https://virpaflaskapp.azurewebsites.net/side');
                   print("Process image");
+                  late String name;
+                  late String gender;
+                  late int age;
+
+                  await firestore
+                      .collection("users")
+                      .doc(id)
+                      .get()
+                      .then((result) {
+                    if (result.data()!['name'] != null &&
+                        result.data()!['gender'] != null &&
+                        result.data()!['age'] != null) {
+                      name = result.data()!['name'];
+                      gender = result.data()!['gender'];
+                      age = result.data()!['age'];
+                    }
+                  });
                   await http
                       .post(url, body: {
                         'id': id,
@@ -122,6 +128,13 @@ class _SideBodyImageState extends State<SideBodyImage> {
                           processingImage = false;
                           imageProcessed = true;
                           processedImageUrl = jsonResponse['result'];
+                          statusString = weightStatusToString(weightStatus(
+                              weight: getWeight(
+                                  context.read<BsaState>().a,
+                                  context.read<BsaState>().b,
+                                  context.read<BsaState>().t),
+                              age: age,
+                              gender: gender == "L" ? Gender.L : Gender.P));
                           context.read<BsaState>().setAVal = jsonResponse['a'];
                           context.read<BsaState>().setTVal = jsonResponse['t'];
                         });
@@ -132,8 +145,10 @@ class _SideBodyImageState extends State<SideBodyImage> {
                 child: Text('Lanjut'))
           ]),
         if (processingImage && !imageProcessed)
-          const Center(
-            child: CircularProgressIndicator(),
+          const Expanded(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           ),
         if (!processingImage && imageProcessed)
           Column(
@@ -191,6 +206,7 @@ class _SideBodyImageState extends State<SideBodyImage> {
                           context.read<BsaState>().t),
                       age: age,
                       gender: gender == "L" ? Gender.L : Gender.P));
+                  context.read<BsaState>().reset();
                   Navigator.of(context).pop(3);
                 },
                 child: Text("Lanjut"),
