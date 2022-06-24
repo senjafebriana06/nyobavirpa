@@ -24,7 +24,8 @@ class _FrontBodyImageState extends State<FrontBodyImage> {
   SharedPreferences? prefs;
 
   String? processedImageUrl;
-  bool isImageProcessed = false;
+  bool processingImage = false;
+  bool imageProcessed = false;
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -64,53 +65,64 @@ class _FrontBodyImageState extends State<FrontBodyImage> {
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
       body: Column(children: [
-        if (isImageProcessed)
-          Image.network(processedImageUrl!, loadingBuilder:
-              (BuildContext context, Widget child,
-                  ImageChunkEvent? loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Center(
-              child: CircularProgressIndicator(
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                    : null,
-              ),
-            );
-          }),
-        if (!isImageProcessed) Image.file(File(widget.imagePath)),
-        ElevatedButton(
-            onPressed: () async {
-              if (!isImageProcessed) {
-                context.read<BsaState>().setB = true;
+        if (!imageProcessed && !processingImage)
+          Column(children: [
+            Image.file(File(widget.imagePath)),
+            ElevatedButton(
+                onPressed: () async {
+                  setState(() {
+                    processingImage = true;
+                  });
+                  prefs = await SharedPreferences.getInstance();
+                  String? id = prefs?.getString("id");
+                  print("Upload Image");
 
-                prefs = await SharedPreferences.getInstance();
-                String? id = await prefs?.getString("id");
-                String? result = await uploadImage(
-                    File(widget.imagePath), 'frontBody', id ?? '');
-                await firestore
-                    .collection('users')
-                    .doc(id)
-                    .update({'frontBody': result});
+                  String? result = await uploadImage(
+                      File(widget.imagePath), 'frontBody', id ?? '');
+                  print("Put result");
+                  await firestore
+                      .collection('users')
+                      .doc(id)
+                      .update({'frontBody': result});
 
-                var url =
-                    Uri.parse('https://virpaflaskapp.azurewebsites.net/front');
-                var response = await http.post(url,
-                    body: {'id': id, 'image_name': basename(widget.imagePath)});
-                var jsonResponse =
-                    convert.jsonDecode(response.body) as Map<String, dynamic>;
-
-                context.read<BsaState>().setBVal = jsonResponse['b'];
-
-                setState(() {
-                  isImageProcessed = true;
-                  processedImageUrl = jsonResponse['result'];
-                });
-              } else {
-                Navigator.of(context).pop(3);
-              }
-            },
-            child: Text('Lanjut')),
+                  var url = Uri.parse(
+                      'https://virpaflaskapp.azurewebsites.net/front');
+                  print("Process image");
+                  await http
+                      .post(url, body: {
+                        'id': id,
+                        'image_name': basename(widget.imagePath)
+                      })
+                      .then((response) => convert.jsonDecode(response.body)
+                          as Map<String, dynamic>)
+                      .then((jsonResponse) {
+                        setState(() {
+                          processingImage = false;
+                          imageProcessed = true;
+                          processedImageUrl = jsonResponse['result'];
+                          context.read<BsaState>().setBVal = jsonResponse['b'];
+                        });
+                      });
+                  context.read<BsaState>().setB = true;
+                  print("Success");
+                },
+                child: Text('Lanjut'))
+          ]),
+        if (processingImage && !imageProcessed)
+          const Center(
+            child: CircularProgressIndicator(),
+          ),
+        if (!processingImage && imageProcessed)
+          Column(
+            children: [
+              Image.network(processedImageUrl!),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(3);
+                  },
+                  child: Text('Lanjut'))
+            ],
+          ),
       ]),
     );
   }

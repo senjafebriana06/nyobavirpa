@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:nyobavirpa/main.dart';
+import 'package:nyobavirpa/service/weight_status_service.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "dart:math" show pi;
+
+import 'models/gender_enum.dart';
+import 'models/weight_status_enum.dart';
 
 class SideBodyImage extends StatefulWidget {
   final String imagePath;
@@ -24,13 +28,25 @@ class _SideBodyImageState extends State<SideBodyImage> {
   SharedPreferences? prefs;
 
   String? processedImageUrl;
-  bool isImageProcessed = false;
+  bool processingImage = false;
+  bool imageProcessed = false;
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   double getWeight(double a, double b, double t) {
     double bsa = (pi / 2) * ((a * b) + ((a + b) * t)) * 1.32 * 0.0001;
     return bsa * bsa * 3600 / t;
+  }
+
+  String weightStatusToString(Status status) {
+    if (status == Status.severlyUnderweight) {
+      return "SEVERLYUNDERWEIGHT";
+    } else if (status == Status.underweight) {
+      return "UNDERWEIGHT";
+    } else if (status == Status.normal) {
+      return "NORMAL";
+    }
+    return "OVERWEIGHT";
   }
 
   Future<String?> uploadImage(File image, String type, String id) async {
@@ -64,64 +80,135 @@ class _SideBodyImageState extends State<SideBodyImage> {
 
   @override
   Widget build(BuildContext context) {
+    String statusString = "";
+
     return Scaffold(
       appBar: AppBar(title: const Text('Display the Picture')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
       body: Column(children: [
-        if (isImageProcessed)
-          Image.network(processedImageUrl!, loadingBuilder:
-              (BuildContext context, Widget child,
-                  ImageChunkEvent? loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Center(
-              child: CircularProgressIndicator(
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                    : null,
+        if (!imageProcessed && !processingImage)
+          Column(children: [
+            Image.file(File(widget.imagePath)),
+            ElevatedButton(
+                onPressed: () async {
+                  setState(() {
+                    processingImage = true;
+                  });
+                  prefs = await SharedPreferences.getInstance();
+                  String? id = prefs?.getString("id");
+                  print("Upload Image");
+
+                  String? result = await uploadImage(
+                      File(widget.imagePath), 'besideBody', id ?? '');
+                  print("Put result");
+                  await firestore
+                      .collection('users')
+                      .doc(id)
+                      .update({'besideBody': result});
+
+                  var url =
+                      Uri.parse('https://virpaflaskapp.azurewebsites.net/side');
+                  print("Process image");
+                  await http
+                      .post(url, body: {
+                        'id': id,
+                        'image_name': basename(widget.imagePath)
+                      })
+                      .then((response) => convert.jsonDecode(response.body)
+                          as Map<String, dynamic>)
+                      .then((jsonResponse) {
+                        setState(() {
+                          processingImage = false;
+                          imageProcessed = true;
+                          processedImageUrl = jsonResponse['result'];
+                          context.read<BsaState>().setAVal = jsonResponse['a'];
+                          context.read<BsaState>().setTVal = jsonResponse['t'];
+                        });
+                      });
+                  context.read<BsaState>().setA = true;
+                  print("Success");
+                },
+                child: Text('Lanjut'))
+          ]),
+        if (processingImage && !imageProcessed)
+          const Center(
+            child: CircularProgressIndicator(),
+          ),
+        if (!processingImage && imageProcessed)
+          Column(
+            children: [
+              Image.network(processedImageUrl!),
+              ElevatedButton(
+                onPressed: () async {
+                  prefs = await SharedPreferences.getInstance();
+                  String? id = prefs?.getString("id");
+
+                  late String name;
+                  late String gender;
+                  late int age;
+
+                  await firestore
+                      .collection("users")
+                      .doc(id)
+                      .get()
+                      .then((result) {
+                    if (result.data()!['name'] != null &&
+                        result.data()!['gender'] != null &&
+                        result.data()!['age'] != null) {
+                      name = result.data()!['name'];
+                      gender = result.data()!['gender'];
+                      age = result.data()!['age'];
+                    }
+                  });
+
+                  await firestore.collection("users").doc(id).update({
+                    "growth": FieldValue.arrayUnion([
+                      {
+                        "age": age,
+                        "gender": gender,
+                        "name": name,
+                        "status": weightStatusToString(weightStatus(
+                            weight: getWeight(
+                                context.read<BsaState>().a,
+                                context.read<BsaState>().b,
+                                context.read<BsaState>().t),
+                            age: age,
+                            gender: gender == "L" ? Gender.L : Gender.P)),
+                        "time": DateTime.now(),
+                        "weight": getWeight(
+                            context.read<BsaState>().a,
+                            context.read<BsaState>().b,
+                            context.read<BsaState>().t),
+                        "height": context.read<BsaState>().t,
+                      },
+                    ])
+                  });
+                  statusString = weightStatusToString(weightStatus(
+                      weight: getWeight(
+                          context.read<BsaState>().a,
+                          context.read<BsaState>().b,
+                          context.read<BsaState>().t),
+                      age: age,
+                      gender: gender == "L" ? Gender.L : Gender.P));
+                  Navigator.of(context).pop(3);
+                },
+                child: Text("Lanjut"),
               ),
-            );
-          }),
-        if (!isImageProcessed) Image.file(File(widget.imagePath)),
+            ],
+          ),
         if (context.read<BsaState>().a_set && context.read<BsaState>().b_set)
-          Text(
-              "Berat badan ${getWeight(context.read<BsaState>().a, context.read<BsaState>().b, context.read<BsaState>().t)}"),
+          Text("Berat badan " +
+              getWeight(context.read<BsaState>().a, context.read<BsaState>().b,
+                      context.read<BsaState>().t)
+                  .toStringAsFixed(2) +
+              " kg"),
         if (context.read<BsaState>().a_set && context.read<BsaState>().b_set)
-          Text("Tinggi badan ${context.read<BsaState>().t}"),
-        ElevatedButton(
-            onPressed: () async {
-              if (!isImageProcessed) {
-                prefs = await SharedPreferences.getInstance();
-                String? id = await prefs?.getString("id");
-                String? result = await uploadImage(
-                    File(widget.imagePath), 'besideBody', id ?? '');
-                await firestore
-                    .collection('users')
-                    .doc(id)
-                    .update({'besideBody': result});
-
-                var url =
-                    Uri.parse('https://virpaflaskapp.azurewebsites.net/side');
-                var response = await http.post(url,
-                    body: {'id': id, 'image_name': basename(widget.imagePath)});
-                print(response.body);
-                var jsonResponse =
-                    convert.jsonDecode(response.body) as Map<String, dynamic>;
-
-                context.read<BsaState>().setAVal = jsonResponse['a'];
-                context.read<BsaState>().setTVal = jsonResponse['t'];
-                context.read<BsaState>().setA = true;
-                setState(() {
-                  isImageProcessed = true;
-                  processedImageUrl = jsonResponse['result'];
-                });
-              } else {
-                Navigator.of(context).pop(3);
-                context.read<BsaState>().reset();
-              }
-            },
-            child: Text('Lanjut'))
+          Text("Tinggi badan " +
+              context.read<BsaState>().t.toStringAsFixed(2) +
+              " cm"),
+        if (context.read<BsaState>().a_set && context.read<BsaState>().b_set)
+          Text(statusString),
       ]),
     );
   }

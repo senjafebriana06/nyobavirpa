@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nyobavirpa/camera.dart';
-import 'package:nyobavirpa/increase.dart';
+import 'package:nyobavirpa/growth.dart';
 import 'package:nyobavirpa/profile.dart';
 
 void main() {
@@ -131,10 +131,8 @@ class MenuPage extends StatelessWidget {
                   minWidth: double.infinity,
                   height: 50,
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => IncreasePage()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Growth()));
                   },
                   color: Color(0xff0095FF),
                   elevation: 2.0,
