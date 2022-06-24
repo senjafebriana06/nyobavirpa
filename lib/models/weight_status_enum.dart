@@ -1,1 +1,1 @@
-enum Status { severlyUnderweight, underweight, normal, overweight }
+enum WeightStatus { severlyUnderweight, underweight, normal, overweight }

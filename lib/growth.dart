@@ -10,6 +10,9 @@ import 'package:nyobavirpa/models/weight_status_enum.dart';
 import 'package:nyobavirpa/service/weight_status_to_string_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'models/height_status_enum.dart';
+import 'service/height_status_to_string_service.dart';
+
 class Growth extends StatefulWidget {
   const Growth({Key? key}) : super(key: key);
 
@@ -83,8 +86,12 @@ class _GrowthState extends State<Growth> {
                             Text(f.format(growth.date.toDate())),
                           ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
                           Row(children: [
-                            Text("Status: "),
-                            Text(weightStatusToString(growth.status))
+                            Text("Status Berat Badan: "),
+                            Text(weightStatusToString(growth.weightStatus))
+                          ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
+                          Row(children: [
+                            Text("Status Tinggi Badan: "),
+                            Text(heightStatusToString(growth.heightStatus))
                           ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
                           Row(children: [
                             Text("Berat Badan: "),
@@ -128,21 +135,30 @@ class _GrowthState extends State<Growth> {
 
     await firestore.collection("users").doc(id).get().then((result) {
       if (result.data()!['growth'] != null) {
-        Status status;
+        WeightStatus weightStatus;
+        HeightStatus heightStatus;
 
         for (final growthItem in result.data()!['growth']) {
-          switch (growthItem['status']) {
+          switch (growthItem['weightStatus']) {
             case "NORMAL":
-              status = Status.normal;
+              weightStatus = WeightStatus.normal;
               break;
             default:
-              status = Status.overweight;
+              weightStatus = WeightStatus.overweight;
+          }
+          switch (growthItem['heightStatus']) {
+            case "NORMAL":
+              heightStatus = HeightStatus.normal;
+              break;
+            default:
+              heightStatus = HeightStatus.tinggi;
           }
           GrowthModel growthModel = GrowthModel(
               name: growthItem['name'],
               gender: growthItem['gender'] == "L" ? Gender.L : Gender.P,
               date: growthItem['time'],
-              status: status,
+              weightStatus: weightStatus,
+              heightStatus: heightStatus,
               age: growthItem['age'],
               height: growthItem['height'],
               weight: growthItem['weight']);

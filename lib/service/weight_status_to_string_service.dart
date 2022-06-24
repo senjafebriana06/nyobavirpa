@@ -1,11 +1,11 @@
 import '../models/weight_status_enum.dart';
 
-String weightStatusToString(Status status) {
-  if (status == Status.severlyUnderweight) {
+String weightStatusToString(WeightStatus weightStatus) {
+  if (weightStatus == WeightStatus.severlyUnderweight) {
     return "SEVERLYUNDERWEIGHT";
-  } else if (status == Status.underweight) {
+  } else if (weightStatus == WeightStatus.underweight) {
     return "UNDERWEIGHT";
-  } else if (status == Status.normal) {
+  } else if (weightStatus == WeightStatus.normal) {
     return "NORMAL";
   }
   return "OVERWEIGHT";

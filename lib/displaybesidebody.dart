@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:nyobavirpa/main.dart';
-import 'package:nyobavirpa/service/weight_status_service.dart';
+import 'package:nyobavirpa/service/height_status_getter_service.dart';
+import 'package:nyobavirpa/service/height_status_to_string_service.dart';
+import 'package:nyobavirpa/service/weight_status_getter_service.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,7 +33,8 @@ class _SideBodyImageState extends State<SideBodyImage> {
   String? processedImageUrl;
   bool processingImage = false;
   bool imageProcessed = false;
-  String statusString = "";
+  String weightStatusString = "";
+  String heightStatusString = "";
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -128,13 +131,19 @@ class _SideBodyImageState extends State<SideBodyImage> {
                           processingImage = false;
                           imageProcessed = true;
                           processedImageUrl = jsonResponse['result'];
-                          statusString = weightStatusToString(weightStatus(
-                              weight: getWeight(
-                                  context.read<BsaState>().a,
-                                  context.read<BsaState>().b,
-                                  context.read<BsaState>().t),
-                              age: age,
-                              gender: gender == "L" ? Gender.L : Gender.P));
+                          weightStatusString = weightStatusToString(
+                              weightStatusGetter(
+                                  weight: getWeight(
+                                      context.read<BsaState>().a,
+                                      context.read<BsaState>().b,
+                                      context.read<BsaState>().t),
+                                  age: age,
+                                  gender: gender == "L" ? Gender.L : Gender.P));
+                          heightStatusString = heightStatusToString(
+                              heightStatusGetter(
+                                  height: context.read<BsaState>().t,
+                                  age: age,
+                                  gender: gender == "L" ? Gender.L : Gender.P));
                           context.read<BsaState>().setAVal = jsonResponse['a'];
                           context.read<BsaState>().setTVal = jsonResponse['t'];
                         });
@@ -183,13 +192,8 @@ class _SideBodyImageState extends State<SideBodyImage> {
                         "age": age,
                         "gender": gender,
                         "name": name,
-                        "status": weightStatusToString(weightStatus(
-                            weight: getWeight(
-                                context.read<BsaState>().a,
-                                context.read<BsaState>().b,
-                                context.read<BsaState>().t),
-                            age: age,
-                            gender: gender == "L" ? Gender.L : Gender.P)),
+                        "weightStatus": weightStatusString,
+                        "heightStatus": heightStatusString,
                         "time": DateTime.now(),
                         "weight": getWeight(
                             context.read<BsaState>().a,
@@ -199,13 +203,6 @@ class _SideBodyImageState extends State<SideBodyImage> {
                       },
                     ])
                   });
-                  statusString = weightStatusToString(weightStatus(
-                      weight: getWeight(
-                          context.read<BsaState>().a,
-                          context.read<BsaState>().b,
-                          context.read<BsaState>().t),
-                      age: age,
-                      gender: gender == "L" ? Gender.L : Gender.P));
                   context.read<BsaState>().reset();
                   Navigator.of(context).pop(3);
                 },
@@ -224,7 +221,15 @@ class _SideBodyImageState extends State<SideBodyImage> {
               context.read<BsaState>().t.toStringAsFixed(2) +
               " cm"),
         if (context.read<BsaState>().a_set && context.read<BsaState>().b_set)
-          Text(statusString),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text("Status Berat Badan :"), Text(weightStatusString)],
+          ),
+        if (context.read<BsaState>().a_set && context.read<BsaState>().b_set)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text("Status Tinggi Badan :"), Text(heightStatusString)],
+          ),
       ]),
     );
   }
