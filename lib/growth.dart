@@ -160,8 +160,8 @@ class _GrowthState extends State<Growth> {
               weightStatus: weightStatus,
               heightStatus: heightStatus,
               age: growthItem['age'],
-              height: growthItem['height'],
-              weight: growthItem['weight']);
+              height: double.parse(growthItem['height'].toString()),
+              weight: double.parse(growthItem['weight'].toString()));
 
           growthList.add(growthModel);
         }
