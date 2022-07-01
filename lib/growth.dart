@@ -7,6 +7,8 @@ import 'package:nyobavirpa/models/gender_enum.dart';
 import 'package:nyobavirpa/models/growth_list_model.dart';
 import 'package:nyobavirpa/models/growth_model.dart';
 import 'package:nyobavirpa/models/weight_status_enum.dart';
+import 'package:nyobavirpa/service/string_to_height_status_service.dart';
+import 'package:nyobavirpa/service/string_to_weight_status_service.dart';
 import 'package:nyobavirpa/service/weight_status_to_string_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -139,20 +141,9 @@ class _GrowthState extends State<Growth> {
         HeightStatus heightStatus;
 
         for (final growthItem in result.data()!['growth']) {
-          switch (growthItem['weightStatus']) {
-            case "NORMAL":
-              weightStatus = WeightStatus.normal;
-              break;
-            default:
-              weightStatus = WeightStatus.overweight;
-          }
-          switch (growthItem['heightStatus']) {
-            case "NORMAL":
-              heightStatus = HeightStatus.normal;
-              break;
-            default:
-              heightStatus = HeightStatus.tinggi;
-          }
+          weightStatus = stringToWeightStatus(growthItem['weightStatus']);
+          heightStatus = stringToHeightStatus(growthItem['heightStatus']);
+
           GrowthModel growthModel = GrowthModel(
               name: growthItem['name'],
               gender: growthItem['gender'] == "L" ? Gender.L : Gender.P,
