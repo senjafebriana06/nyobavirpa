@@ -25,7 +25,8 @@ class _ProfilePageState extends State<ProfilePage> {
           builder: (context, profileSnap) {
             if (profileSnap.data?.nama == null ||
                 profileSnap.data?.jenisKelamin == null ||
-                profileSnap.data?.umur == null) {
+                profileSnap.data?.umur == null ||
+                profileSnap.data?.lingkarKepala == null) {
               return Container(
                 child: Center(child: Text("Loading")),
               );
@@ -76,11 +77,36 @@ class _ProfilePageState extends State<ProfilePage> {
                   Text((profileSnap.data?.jenisKelamin)! == "L"
                       ? "Laki-laki"
                       : "Perempuan"),
+                  SizedBox(
+                    height: 8,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Text("Tanggal Lahir : "),
+                      Text((profileSnap.data?.tanggalLahir)!),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Umur : "),
                       Text((profileSnap.data?.umur)!.toString()),
                       Text(" bulan"),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Lingkar Kepala : "),
+                      Text((profileSnap.data?.lingkarKepala)!.toString()),
+                      Text(" cm"),
                     ],
                   ),
                   SizedBox(
@@ -117,17 +143,25 @@ class _ProfilePageState extends State<ProfilePage> {
     prefs = await SharedPreferences.getInstance();
     String? id = prefs?.getString("id");
 
-    ProfileModel profileModel =
-        ProfileModel(jenisKelamin: "", nama: "", umur: 0);
+    ProfileModel profileModel = ProfileModel(
+        jenisKelamin: "",
+        nama: "",
+        umur: 0,
+        tanggalLahir: DateTime.now().toString(),
+        lingkarKepala: 0.0);
 
     await firestore.collection("users").doc(id).get().then((result) {
       if (result.data()!['name'] != null &&
           result.data()!['gender'] != null &&
-          result.data()!['age'] != null) {
+          result.data()!['age'] != null &&
+          result.data()!['headSize'] != null &&
+          result.data()!['dateOfBirth'] != null) {
         profileModel = ProfileModel(
             nama: result.data()!['name'],
             umur: result.data()!['age'],
-            jenisKelamin: result.data()!['gender']);
+            jenisKelamin: result.data()!['gender'],
+            lingkarKepala: result.data()!['headSize'],
+            tanggalLahir: result.data()!['dateOfBirth']);
       }
     });
     return profileModel;

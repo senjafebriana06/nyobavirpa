@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:nyobavirpa/component/custom_radio_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,6 +18,8 @@ class _ProfileFormState extends State<ProfileForm> {
   Gender? _gender = Gender.L;
   TextEditingController nameInputController = TextEditingController();
   TextEditingController ageInputController = TextEditingController();
+  TextEditingController headInputController = TextEditingController();
+  late String dateOfBirth;
 
   ValueChanged<Gender?> _valueChangedHandler() {
     return (value) => setState(() => _gender = value!);
@@ -31,11 +34,12 @@ class _ProfileFormState extends State<ProfileForm> {
     void onSaveHandler() async {
       prefs = await SharedPreferences.getInstance();
       String? id = prefs?.getString("id");
-      print("adasd");
       firestore.collection("users").doc(id).set({
         'name': nameInputController.text,
         'age': int.parse(ageInputController.text),
-        'gender': _gender == Gender.L ? "L" : "P"
+        'gender': _gender == Gender.L ? "L" : "P",
+        'headSize': double.parse(headInputController.text),
+        'dateOfBirth': dateOfBirth,
       }, SetOptions(merge: true)).then((value) {
         int count = 0;
         Navigator.of(context).popUntil((_) => count++ >= 2);
@@ -63,6 +67,21 @@ class _ProfileFormState extends State<ProfileForm> {
                   ),
                   controller: ageInputController,
                   keyboardType: TextInputType.number,
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Masukan Lingkar Kepala (dalam cm)",
+                    labelText: "Lingkar Kepala",
+                  ),
+                  controller: headInputController,
+                  keyboardType: TextInputType.number,
+                ),
+                DateTimePicker(
+                  initialValue: '',
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                  dateLabelText: 'Date',
+                  onChanged: (val) => dateOfBirth = val,
                 ),
                 Container(
                   child: Column(

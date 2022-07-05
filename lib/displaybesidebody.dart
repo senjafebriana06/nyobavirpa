@@ -105,6 +105,8 @@ class _SideBodyImageState extends State<SideBodyImage> {
                   late String name;
                   late String gender;
                   late int age;
+                  late String dateOfBirth;
+                  late double headSize;
 
                   await firestore
                       .collection("users")
@@ -119,6 +121,7 @@ class _SideBodyImageState extends State<SideBodyImage> {
                       age = result.data()!['age'];
                     }
                   });
+
                   await http
                       .post(url, body: {
                         'id': id,
@@ -171,6 +174,8 @@ class _SideBodyImageState extends State<SideBodyImage> {
                   late String name;
                   late String gender;
                   late int age;
+                  late String dateOfBirth;
+                  late double headSize;
 
                   await firestore
                       .collection("users")
@@ -179,10 +184,14 @@ class _SideBodyImageState extends State<SideBodyImage> {
                       .then((result) {
                     if (result.data()!['name'] != null &&
                         result.data()!['gender'] != null &&
-                        result.data()!['age'] != null) {
+                        result.data()!['age'] != null &&
+                        result.data()!['headSize'] != null &&
+                        result.data()!['dateOfBirth'] != null) {
                       name = result.data()!['name'];
                       gender = result.data()!['gender'];
                       age = result.data()!['age'];
+                      headSize = result.data()!['headSize'];
+                      dateOfBirth = result.data()!['dateOfBirth'];
                     }
                   });
 
@@ -200,6 +209,8 @@ class _SideBodyImageState extends State<SideBodyImage> {
                             context.read<BsaState>().b,
                             context.read<BsaState>().t),
                         "height": context.read<BsaState>().t,
+                        "headSize": headSize,
+                        "dateOfBirth": dateOfBirth
                       },
                     ])
                   });

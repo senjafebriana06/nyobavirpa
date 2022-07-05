@@ -73,6 +73,14 @@ class _GrowthState extends State<Growth> {
                             Text("Nama: "),
                             Text(growth.name)
                           ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
+                          if (growth.dateOfBirth != null)
+                            Row(
+                                children: [
+                                  Text("Tanggal lahir: "),
+                                  Text(growth.dateOfBirth)
+                                ],
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween),
                           Row(children: [
                             Text("Umur: "),
                             Text(growth.age.toString())
@@ -103,6 +111,15 @@ class _GrowthState extends State<Growth> {
                             Text("Tinggi Badan: "),
                             Text(growth.height.toStringAsFixed(2) + " Cm")
                           ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
+                          if (growth.headSize != null)
+                            Row(
+                                children: [
+                                  Text("Lingkar Kepala: "),
+                                  Text(growth.headSize.toStringAsFixed(2) +
+                                      " Cm")
+                                ],
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween),
                         ],
                       ),
                     )
@@ -118,22 +135,6 @@ class _GrowthState extends State<Growth> {
     String? id = prefs?.getString("id");
 
     List<GrowthModel> growthList = [];
-
-    late String name;
-    late int age;
-    late Gender gender;
-    late double weight;
-    late double height;
-
-    await firestore.collection("users").doc(id).get().then((result) {
-      if (result.data()!['name'] != null &&
-          result.data()!['gender'] != null &&
-          result.data()!['age'] != null) {
-        name = result.data()!['name'];
-        age = result.data()!['age'];
-        gender = result.data()!['gender'] == "L" ? Gender.L : Gender.P;
-      }
-    });
 
     await firestore.collection("users").doc(id).get().then((result) {
       if (result.data()!['growth'] != null) {
@@ -152,7 +153,9 @@ class _GrowthState extends State<Growth> {
               heightStatus: heightStatus,
               age: growthItem['age'],
               height: double.parse(growthItem['height'].toString()),
-              weight: double.parse(growthItem['weight'].toString()));
+              weight: double.parse(growthItem['weight'].toString()),
+              dateOfBirth: growthItem['dateOfBirth'],
+              headSize: growthItem['headSize']);
 
           growthList.add(growthModel);
         }

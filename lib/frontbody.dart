@@ -4,7 +4,6 @@ import 'package:nyobavirpa/displayfrontbody.dart';
 import 'displayfrontbody.dart';
 import 'main.dart';
 
-
 class FrontBodyCamera extends StatefulWidget {
   final bool isCameraOverlayCircle;
 

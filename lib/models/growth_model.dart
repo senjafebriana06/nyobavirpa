@@ -8,10 +8,12 @@ class GrowthModel {
   Gender gender;
   int age;
   Timestamp date;
+  String dateOfBirth;
   WeightStatus weightStatus;
   HeightStatus heightStatus;
   double weight;
   double height;
+  double headSize;
 
   GrowthModel(
       {required this.name,
@@ -21,5 +23,7 @@ class GrowthModel {
       required this.weightStatus,
       required this.heightStatus,
       required this.weight,
-      required this.height});
+      required this.height,
+      required this.dateOfBirth,
+      required this.headSize});
 }

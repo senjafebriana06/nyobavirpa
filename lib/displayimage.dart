@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:http/http.dart' as http;
 
 class DisplayImage extends StatefulWidget {
   final String imagePath;
@@ -67,10 +68,51 @@ class _DisplayImageState extends State<DisplayImage> {
               String? result =
                   await uploadImage(File(widget.imagePath), 'head', id ?? '');
 
+              late String name;
+              late String gender;
+              late int age;
+              late String dateOfBirth;
+              late double headSize;
+
               await firestore
                   .collection('users')
                   .doc(id)
                   .update({'head': result});
+
+              await firestore.collection("users").doc(id).get().then((result) {
+                if (result.data()!['name'] != null &&
+                    result.data()!['gender'] != null &&
+                    result.data()!['age'] != null &&
+                    result.data()!['dateOfBirth'] != null &&
+                    result.data()!['headSize'] != null) {
+                  name = result.data()!['name'];
+                  gender = result.data()!['gender'];
+                  age = result.data()!['age'];
+                  dateOfBirth = result.data()!['dateOfBirth'];
+                  headSize = result.data()!['headSize'];
+                }
+              });
+
+              var request = http.MultipartRequest(
+                  'POST', Uri.parse('http://webvirpa.rgtasty.com/api/deteksi'));
+              request.fields.addAll({
+                'name': name,
+                'jenis_kelamin': gender == 'L' ? 'Laki-laki' : 'Perempuan',
+                'umur': '$age bulan',
+                'tanggal_masuk': '2022-03-10',
+                'ttl': dateOfBirth
+              });
+              request.files.add(await http.MultipartFile.fromPath(
+                  'gambar', widget.imagePath));
+
+              http.StreamedResponse response = await request.send();
+
+              if (response.statusCode == 200) {
+                print(await response.stream.bytesToString());
+              } else {
+                print(response.reasonPhrase);
+              }
+
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => MenuPage()),
                   (Route<dynamic> route) => false);
