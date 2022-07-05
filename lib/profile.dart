@@ -26,8 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
           builder: (context, profileSnap) {
             if (profileSnap.data?.nama == null ||
                 profileSnap.data?.jenisKelamin == null ||
-                profileSnap.data?.umur == null ||
-                profileSnap.data?.lingkarKepala == null) {
+                profileSnap.data?.umur == null) {
               return Container(
                 child: Center(child: Text("Loading")),
               );
@@ -35,6 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
             if (profileSnap.data?.nama == "" ||
                 profileSnap.data?.jenisKelamin == "" ||
                 profileSnap.data?.umur == 0) {
+              print(profileSnap.data?.jenisKelamin);
               return Container(
                 padding: const EdgeInsets.all(18.0),
                 width: double.infinity,
@@ -102,14 +102,15 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(
                     height: 8,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Lingkar Kepala : "),
-                      Text((profileSnap.data?.lingkarKepala)!.toString()),
-                      Text(" cm"),
-                    ],
-                  ),
+                  if ((profileSnap.data?.lingkarKepala) != null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Lingkar Kepala : "),
+                        Text((profileSnap.data?.lingkarKepala).toString()),
+                        Text(" cm"),
+                      ],
+                    ),
                   SizedBox(
                     height: 18,
                   ),
@@ -164,7 +165,6 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<ProfileModel> _getProfile() async {
     prefs = await SharedPreferences.getInstance();
     String? id = prefs?.getString("id");
-
     ProfileModel profileModel = ProfileModel(
         jenisKelamin: "",
         nama: "",
@@ -175,9 +175,7 @@ class _ProfilePageState extends State<ProfilePage> {
     await firestore.collection("users").doc(id).get().then((result) {
       if (result.data()!['name'] != null &&
           result.data()!['gender'] != null &&
-          result.data()!['age'] != null &&
-          result.data()!['headSize'] != null &&
-          result.data()!['dateOfBirth'] != null) {
+          result.data()!['age'] != null) {
         profileModel = ProfileModel(
             nama: result.data()!['name'],
             umur: result.data()!['age'],
