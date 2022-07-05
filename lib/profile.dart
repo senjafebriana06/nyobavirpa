@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:nyobavirpa/headSizeForm.dart';
 import 'package:nyobavirpa/models/profile_model.dart';
 import 'package:nyobavirpa/profileForm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -116,18 +117,39 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Container(
                       child: Center(
                           child: Text(
-                        "Ubah",
+                        "Ubah Profile",
                         style: TextStyle(color: Colors.white),
                       )),
                       color: Colors.blue,
                       padding: EdgeInsets.symmetric(vertical: 8.0),
-                      width: 100.0,
+                      width: 175.0,
                     ),
                     onTap: () async {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const ProfileForm()));
+                    },
+                  ),
+                  SizedBox(
+                    height: 4,
+                  ),
+                  InkWell(
+                    child: Container(
+                      child: Center(
+                          child: Text(
+                        "Ubah Lingkar Kepala",
+                        style: TextStyle(color: Colors.white),
+                      )),
+                      color: Colors.blue,
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      width: 175.0,
+                    ),
+                    onTap: () async {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const HeadSizeForm()));
                     },
                   )
                 ],

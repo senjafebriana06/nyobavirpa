@@ -6,18 +6,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/gender_enum.dart';
 
-class ProfileForm extends StatefulWidget {
-  const ProfileForm({Key? key}) : super(key: key);
+class HeadSizeForm extends StatefulWidget {
+  const HeadSizeForm({Key? key}) : super(key: key);
 
   @override
-  State<ProfileForm> createState() => _ProfileFormState();
+  State<HeadSizeForm> createState() => _HeadSizeFormState();
 }
 
-class _ProfileFormState extends State<ProfileForm> {
+class _HeadSizeFormState extends State<HeadSizeForm> {
   final _formKey = GlobalKey<FormState>();
   Gender? _gender = Gender.L;
   TextEditingController nameInputController = TextEditingController();
   TextEditingController ageInputController = TextEditingController();
+  TextEditingController headInputController = TextEditingController();
   late String dateOfBirth;
 
   ValueChanged<Gender?> _valueChangedHandler() {
@@ -34,10 +35,7 @@ class _ProfileFormState extends State<ProfileForm> {
       prefs = await SharedPreferences.getInstance();
       String? id = prefs?.getString("id");
       firestore.collection("users").doc(id).set({
-        'name': nameInputController.text,
-        'age': int.parse(ageInputController.text),
-        'gender': _gender == Gender.L ? "L" : "P",
-        'dateOfBirth': dateOfBirth,
+        'headSize': double.parse(headInputController.text),
       }, SetOptions(merge: true)).then((value) {
         int count = 0;
         Navigator.of(context).popUntil((_) => count++ >= 2);
@@ -53,53 +51,11 @@ class _ProfileFormState extends State<ProfileForm> {
               children: [
                 TextFormField(
                   decoration: const InputDecoration(
-                    hintText: "Masukan Nama Lengkap",
-                    labelText: "Nama Lengkap",
+                    hintText: "Masukan Lingkar Kepala (dalam cm)",
+                    labelText: "Lingkar Kepala",
                   ),
-                  controller: nameInputController,
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: "Masukan Umur (dalam Bulan)",
-                    labelText: "Umur",
-                  ),
-                  controller: ageInputController,
+                  controller: headInputController,
                   keyboardType: TextInputType.number,
-                ),
-                DateTimePicker(
-                  initialValue: '',
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                  dateLabelText: 'Date',
-                  onChanged: (val) => dateOfBirth = val,
-                ),
-                Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const SizedBox(
-                        height: 18.0,
-                      ),
-                      const Text(
-                        "Jenis Kelamin",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      MyRadioOption<Gender>(
-                        value: Gender.L,
-                        groupValue: _gender,
-                        label: '1',
-                        text: 'Laki-laki',
-                        onChanged: _valueChangedHandler(),
-                      ),
-                      MyRadioOption<Gender>(
-                        value: Gender.P,
-                        groupValue: _gender,
-                        label: '121',
-                        text: 'Perempuan',
-                        onChanged: _valueChangedHandler(),
-                      ),
-                    ],
-                  ),
                 ),
                 const SizedBox(
                   height: 18.0,
