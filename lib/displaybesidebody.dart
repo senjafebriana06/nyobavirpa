@@ -176,6 +176,7 @@ class _SideBodyImageState extends State<SideBodyImage> {
                   late int age;
                   late String dateOfBirth;
                   late double headSize;
+                  late String headSizeStatus;
 
                   await firestore
                       .collection("users")
@@ -192,6 +193,7 @@ class _SideBodyImageState extends State<SideBodyImage> {
                       age = result.data()!['age'];
                       headSize = result.data()!['headSize'];
                       dateOfBirth = result.data()!['dateOfBirth'];
+                      headSizeStatus = result.data()!['headSizeStatus'];
                     }
                   });
 
@@ -210,7 +212,8 @@ class _SideBodyImageState extends State<SideBodyImage> {
                             context.read<BsaState>().t),
                         "height": context.read<BsaState>().t,
                         "headSize": headSize,
-                        "dateOfBirth": dateOfBirth
+                        "dateOfBirth": dateOfBirth,
+                        "headSizeStatus": headSizeStatus,
                       },
                     ])
                   });

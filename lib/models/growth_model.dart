@@ -14,16 +14,19 @@ class GrowthModel {
   double weight;
   double height;
   double headSize;
+  String headSizeStatus;
 
-  GrowthModel(
-      {required this.name,
-      required this.gender,
-      required this.age,
-      required this.date,
-      required this.weightStatus,
-      required this.heightStatus,
-      required this.weight,
-      required this.height,
-      required this.dateOfBirth,
-      required this.headSize});
+  GrowthModel({
+    required this.name,
+    required this.gender,
+    required this.age,
+    required this.date,
+    required this.weightStatus,
+    required this.heightStatus,
+    required this.weight,
+    required this.height,
+    required this.dateOfBirth,
+    required this.headSize,
+    required this.headSizeStatus,
+  });
 }

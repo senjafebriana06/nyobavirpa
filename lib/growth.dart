@@ -120,6 +120,14 @@ class _GrowthState extends State<Growth> {
                                 ],
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween),
+                          if (growth.headSizeStatus != null)
+                            Row(
+                                children: [
+                                  Text("Status Lingkar Kepala: "),
+                                  Text(growth.headSizeStatus)
+                                ],
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween),
                         ],
                       ),
                     )
@@ -155,7 +163,8 @@ class _GrowthState extends State<Growth> {
               height: double.parse(growthItem['height'].toString()),
               weight: double.parse(growthItem['weight'].toString()),
               dateOfBirth: growthItem['dateOfBirth'],
-              headSize: growthItem['headSize']);
+              headSize: growthItem['headSize'],
+              headSizeStatus: growthItem['headSizeStatus']);
 
           growthList.add(growthModel);
         }

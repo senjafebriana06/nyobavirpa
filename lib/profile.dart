@@ -112,6 +112,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                   SizedBox(
+                    height: 8,
+                  ),
+                  if ((profileSnap.data?.statusLingkarKepala) != null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Status Lingkar Kepala : "),
+                        Text((profileSnap.data?.statusLingkarKepala)!),
+                      ],
+                    ),
+                  SizedBox(
                     height: 18,
                   ),
                   InkWell(
@@ -170,7 +181,8 @@ class _ProfilePageState extends State<ProfilePage> {
         nama: "",
         umur: 0,
         tanggalLahir: DateTime.now().toString(),
-        lingkarKepala: 0.0);
+        lingkarKepala: 0.0,
+        statusLingkarKepala: '');
 
     await firestore.collection("users").doc(id).get().then((result) {
       if (result.data()!['name'] != null &&
@@ -181,7 +193,8 @@ class _ProfilePageState extends State<ProfilePage> {
             umur: result.data()!['age'],
             jenisKelamin: result.data()!['gender'],
             lingkarKepala: result.data()!['headSize'],
-            tanggalLahir: result.data()!['dateOfBirth']);
+            tanggalLahir: result.data()!['dateOfBirth'],
+            statusLingkarKepala: result.data()!['headSizeStatus']);
       }
     });
     return profileModel;

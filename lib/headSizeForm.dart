@@ -15,14 +15,14 @@ class HeadSizeForm extends StatefulWidget {
 
 class _HeadSizeFormState extends State<HeadSizeForm> {
   final _formKey = GlobalKey<FormState>();
-  Gender? _gender = Gender.L;
   TextEditingController nameInputController = TextEditingController();
   TextEditingController ageInputController = TextEditingController();
   TextEditingController headInputController = TextEditingController();
   late String dateOfBirth;
+  String? _headSizeStatus = "Normal";
 
-  ValueChanged<Gender?> _valueChangedHandler() {
-    return (value) => setState(() => _gender = value!);
+  ValueChanged<String?> _valueChangedHandler() {
+    return (value) => setState(() => _headSizeStatus = value!);
   }
 
   @override
@@ -36,6 +36,7 @@ class _HeadSizeFormState extends State<HeadSizeForm> {
       String? id = prefs?.getString("id");
       firestore.collection("users").doc(id).set({
         'headSize': double.parse(headInputController.text),
+        'headSizeStatus': _headSizeStatus,
       }, SetOptions(merge: true)).then((value) {
         int count = 0;
         Navigator.of(context).popUntil((_) => count++ >= 2);
@@ -56,6 +57,41 @@ class _HeadSizeFormState extends State<HeadSizeForm> {
                   ),
                   controller: headInputController,
                   keyboardType: TextInputType.number,
+                ),
+                Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const SizedBox(
+                        height: 18.0,
+                      ),
+                      const Text(
+                        "Status Lingkar Kepala",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      MyRadioOption<String>(
+                        value: "Dibawah Normal",
+                        groupValue: _headSizeStatus,
+                        label: '1',
+                        text: "Dibawah Normal",
+                        onChanged: _valueChangedHandler(),
+                      ),
+                      MyRadioOption<String>(
+                        value: "Normal",
+                        groupValue: _headSizeStatus,
+                        label: '2',
+                        text: 'Normal',
+                        onChanged: _valueChangedHandler(),
+                      ),
+                      MyRadioOption<String>(
+                        value: "Diatas Normal",
+                        groupValue: _headSizeStatus,
+                        label: '1',
+                        text: "Diatas Normal",
+                        onChanged: _valueChangedHandler(),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(
                   height: 18.0,
